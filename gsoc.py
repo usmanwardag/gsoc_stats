@@ -5,10 +5,6 @@ class GSOC(object):
     def __init__(self):
         """
         Load GSOC 2016 data from a CSV file.
-
-        Attributes
-        ----------
-        data: 
         """
 
         self.data = pd.read_csv('data.csv')
@@ -48,6 +44,7 @@ class GSOC(object):
         elif org is None:
             org = self.orgs
         else:
+            # For consistency later
             org = [org]
 
         projects = dict()
@@ -71,6 +68,7 @@ class GSOC(object):
 
         for t in self.titles:
             if name.lower() in t.lower():
+                # Some pandas stuff here, maybe it can be made more concise.
                 match = self.data[self.data[self.cols[0]] == t]
                 index = match[self.cols[2]].index.tolist()
                 matches[t] = match.at[int(index[0]), self.cols[2]]
