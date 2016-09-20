@@ -1,5 +1,4 @@
 
-import numpy as np
 import pandas as pd
 
 class GSOC(object):
@@ -15,12 +14,13 @@ class GSOC(object):
 		self.data = pd.read_csv('data.csv')
 		self.cols = self.data.keys()
 		self.orgs = self.data[self.cols[2]].unique()
-		self.titles = self.data[self.cols[0]]
+		self.titles = self.data[self.cols[0]].tolist()
 
 	def total_projects(self):
 		"""
 		Count total projects that got accepted in GSOC 2016.
 		"""
+		
 		return len(self.titles)
 
 	def total_orgs(self):
@@ -45,10 +45,8 @@ class GSOC(object):
 
 		if (org not in self.orgs) and (org is not None):
 			raise ValueError('No such organization by this name.')
-
 		elif org is None:
 			org = self.orgs
-
 		else:
 			org = [org]
 
@@ -79,8 +77,10 @@ class GSOC(object):
 
 		return matches
 
-gsoc = GSOC()
-print gsoc.total_projects()
-print gsoc.total_orgs()
-print gsoc.org_projects(threshold=20)
-print gsoc.search_projects('signal')
+	def combine_titles(self):
+		"""
+		Combine all titles into a single string
+		"""
+
+		return ' '.join(self.titles)
+
