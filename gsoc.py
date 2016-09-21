@@ -1,5 +1,9 @@
-
+import numpy as np
 import pandas as pd
+from matplotlib import pyplot as plt
+from textwrap import wrap
+import re
+from collections import Counter
 
 class GSOC(object):
     def __init__(self):
@@ -7,7 +11,7 @@ class GSOC(object):
         Load GSOC 2016 data from a CSV file.
         """
 
-        self.data = pd.read_csv('data.csv')
+        self.data = pd.read_csv('resources/data.csv')
         self.cols = self.data.keys()
         self.orgs = self.data[self.cols[2]].unique()
         self.titles = self.data[self.cols[0]].tolist()
@@ -26,7 +30,7 @@ class GSOC(object):
 
         return len(self.orgs)
 
-    def org_projects(self, org=None, threshold=None):
+    def org_projects(self, org=None, threshold=None, order='desc'):
         """
         List projects posted by each organization.
 
@@ -57,7 +61,13 @@ class GSOC(object):
                 if projects[p] < threshold:
                     projects.pop(p, 'None')
 
-        return sorted(projects.items(), key=lambda x: -x[1])
+        if order == 'asc':
+            projects = sorted(projects.items(), key=lambda x: x[1])
+        else:
+            projects = sorted(projects.items(), key=lambda x: -x[1])
+
+        return projects
+
 
     def search_projects(self, name):
         """
@@ -82,3 +92,37 @@ class GSOC(object):
 
         return ' '.join(self.titles)
 
+    def plot_orgs(self, threshold):
+        """
+        Plot a bar chart of organizations, arranged according to 
+        number of projects they accepted.
+        """
+
+        projects = self.org_projects(threshold=threshold, order='asc')
+        orgs = ['\n'.join(wrap(p[0], 18)) for p in projects]
+        y_pos = np.arange(len(orgs))
+        counts = [p[1] for p in projects]
+        plt.barh(y_pos, counts, align='center', alpha=0.5, color='green')
+        plt.yticks(y_pos, orgs, size=10, family='monospace')
+        plt.grid(True)
+        plt.xlabel('Number of Projects Accepted', size=14, family='monospace')
+        plt.show()
+
+    def extract_keywords(self):
+        """
+        Extract the most frequent words from project titles, after removing stop
+        words.
+        """
+
+        STOPWORDS = [x.strip() for x in open('resources/stopwords.txt').read().split('\n')]
+        text = self.combine_titles()
+        words = re.findall('\w+', text.lower())
+        counts = Counter(words).most_common(500)
+
+        final = []
+
+        for c in counts:
+            if c[0] not in STOPWORDS:
+                final.append(c)
+
+        return final

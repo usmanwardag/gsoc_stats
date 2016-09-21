@@ -14,7 +14,9 @@ print obj.total_orgs()
 print obj.org_projects()
 
 # Or, apply a threshold on last count
-print obj.org_projects(threshold=5)
+print obj.org_projects(threshold=25)
 
 # Search for specific projects
-print obj.search_projects('signal')
+print obj.search_projects('radio')
+
+print obj.extract_keywords()
